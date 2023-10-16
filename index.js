@@ -6,38 +6,12 @@ const express = require('express')
 const morgan = require('morgan')
 const { token } = require('morgan')
 const cors = require('cors')
-const mongoose = require('mongoose')
+require('dotenv').config()
 
+const Item = require('./models/item')
+const Order = require('./models/order')
+const User = require('./models/user')
 
-/*const url =
-  `sthsth${password}sthsth`
-
-mongoose.set('strictQuery', false)
-mongoose.connect(url)
-
-const itemSchema = new mongoose.Schema({
-  name: String,
-  description: String,
-  orders_needed: Number,
-  orders_now: Number,
-  price: Number,
-  URL: String,
-  start_date: Date,
-  end_date: Date,
-  customers: [userSchema._id]
-})
-
-const userSchema = new mongoose.Schema({
-    name:String,
-    orders: [itemSchema],
-    password: String,
-    cash: Number
-})
-
-
-const Item = mongoose.model('Item', itemSchema)
-const User = mongoose.model('User' , userSchema)
-*/
 const app = express()
 
 app.use(cors())
@@ -56,39 +30,61 @@ app.use(morgan(function (tokens, req, res) {
   return (ret)
   }))
 
-
+ 
 
 // Get all
 
-app.get('/items' , (req,res) => {
-  res.status(404).end()
-
+app.get('/api/items' , (req,res) => {
   Item.find({}).then(items => {
     res.json(items)
-    mongoose.connection.close()
   })
 })
 
-app.get('/users' , (req,res) => {
-
+app.get('api/users' , (req,res) => {
     User.find({}).then(users => {
       res.json(users)
-      mongoose.connection.close()
     })
   })
 
   // Get one by id NOT FINISHED TODO ALSO FOR USERS
 
-  app.get('/items/:id' , (req,res) => {
-    const id = Number(req.params.id)
-    Item.find({}).then(items => {
+  app.get('/api/items/:id' , (req,res) => {
+    Item.find({id:req.params.id}).then(items => {
       res.json(items)
       mongoose.connection.close()
     })
   })
 
+  app.get('/api/users/:id' , (req,res) => {
+    Item.find({id:req.params.id}).then(items => {
+      res.json(items)
+    })
+  })
+
+
+
+
   // Create new items TODO ALSO FOR ITEMS
-  app.post('/users' , (req,res) => {
+  app.post('/api/items', (req, res) => {
+    const body = req.body
+    console.log("WASSAAOSDUIFGHPAIUDHFPAIUWFHPASDIUFHPAISUDHFPIAUGFH" , body.name)
+    if (body.name === undefined) {
+      return res.status(400).json({ error: 'content missing' })
+    }
+  
+    const item = new Item({
+      name: body.name,
+      category: body.category,
+      description: body.description,
+      orders_needed: body.orders_needed,
+      price:body.price,
+      URL: body.URL,
+      end_date: body.end_date
+    })
+    
+    item.save().then(savedItem => {
+      res.json(savedItem)
+    })
   })
 
   //delete single resources TODO ALSO FOR USERS
