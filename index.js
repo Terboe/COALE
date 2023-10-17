@@ -40,7 +40,7 @@ app.get('/api/items' , (req,res) => {
   })
 })
 
-app.get('api/users' , (req,res) => {
+app.get('/api/users' , (req,res) => {
     User.find({}).then(users => {
       res.json(users)
     })
@@ -51,13 +51,12 @@ app.get('api/users' , (req,res) => {
   app.get('/api/items/:id' , (req,res) => {
     Item.find({id:req.params.id}).then(items => {
       res.json(items)
-      mongoose.connection.close()
     })
   })
 
   app.get('/api/users/:id' , (req,res) => {
-    Item.find({id:req.params.id}).then(items => {
-      res.json(items)
+    User.find({id:req.params.id}).then(users => {
+      res.json(users)
     })
   })
 
@@ -67,7 +66,6 @@ app.get('api/users' , (req,res) => {
   // Create new items TODO ALSO FOR ITEMS
   app.post('/api/items', (req, res) => {
     const body = req.body
-    console.log("WASSAAOSDUIFGHPAIUDHFPAIUWFHPASDIUFHPAISUDHFPIAUGFH" , body.name)
     if (body.name === undefined) {
       return res.status(400).json({ error: 'content missing' })
     }
@@ -86,6 +84,26 @@ app.get('api/users' , (req,res) => {
       res.json(savedItem)
     })
   })
+
+
+  app.post('/api/users', (req, res) => {
+    const body = req.body
+    if (body.username === undefined) {
+      return res.status(400).json({ error: 'content missing' })
+    }
+  
+    const user = new User({
+      username:body.username,
+      first_name:body.first_name,
+      last_name:body.last_name,
+      password_hash: body.password_hash,
+  })
+    
+    user.save().then(savedUser => {
+      res.json(savedUser)
+    })
+  })
+
 
   //delete single resources TODO ALSO FOR USERS
 
