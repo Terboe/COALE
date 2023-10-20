@@ -7,11 +7,11 @@ const morgan = require('morgan')
 const { token } = require('morgan')
 const cors = require('cors')
 require('dotenv').config()
-
+const testitems = require('./testItems')
 const Item = require('./models/item')
 const Order = require('./models/order')
 const User = require('./models/user')
-
+const bcrypt = require('bcrypt')
 const app = express()
 
 app.use(cors())
@@ -61,8 +61,6 @@ app.get('/api/users' , (req,res) => {
   })
 
 
-
-
   // Create new items TODO ALSO FOR ITEMS
   app.post('/api/items', (req, res) => {
     const body = req.body
@@ -85,18 +83,20 @@ app.get('/api/users' , (req,res) => {
     })
   })
 
-
-  app.post('/api/users', (req, res) => {
+  app.post('/api/users', async (req, res) => {
     const body = req.body
     if (body.username === undefined) {
       return res.status(400).json({ error: 'content missing' })
     }
-  
+    const saltrounds = 10
+    const pswhash = await bcrypt.hash(body.password,saltrounds)
+
+
     const user = new User({
       username:body.username,
       first_name:body.first_name,
       last_name:body.last_name,
-      password_hash: body.password_hash,
+      password_hash: pswhash,
   })
     
     user.save().then(savedUser => {

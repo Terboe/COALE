@@ -26,7 +26,7 @@ const itemSchema = new mongoose.Schema({
     URL: String,
     start_date: {type:Date , default: Date.now},
     end_date: Date,
-    //FIX THIS!
+    //FIX THIS OR REMOVE IT, ITEM DOENS'T NEED TO KNOW ORDERS!
     orders: {type:[String], default: []},
     photoURL: {type: String, default: "https://upload.wikimedia.org/wikipedia/commons/1/10/Banana_isolated_on_white.jpg"}
   })
