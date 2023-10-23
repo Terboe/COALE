@@ -1,5 +1,6 @@
 POST http://localhost:3002/api/items HTTP/1.1
 Content-Type: application/json
+Authorization: Bearer eyJhbGciOiJIUzI1NiIInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6IlN0cmluZzMiLCJpZCI6IjY1MzI0NWFhNzM2NmJiMGQxMDZiY2I3YyIsImlhdCI6MTY5ODAxOTA3MX0.y8O0uEBhC4JIgmxoZQBItbUME0TRMJGeKmVc3NjKWiE
 
 {
     "name": "FF",

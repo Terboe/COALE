@@ -13,6 +13,7 @@ const Order = require('./models/order')
 const User = require('./models/user')
 const bcrypt = require('bcrypt')
 const app = express()
+const jwt = require('jsonwebtoken')
 
 app.use(cors())
 app.use(express.json())
@@ -31,6 +32,44 @@ app.use(morgan(function (tokens, req, res) {
   }))
 
  
+
+
+
+  const getTokenFrom = request => {
+    const authorization = request.get('authorization')
+    if (authorization && authorization.startsWith('Bearer ')) {
+      return authorization.replace('Bearer ', '')
+    }
+    return null
+  }
+
+  app.post('/api/login', async (request, response) => {
+    const { username, password } = request.body
+  
+    const user = await User.findOne({ username })
+    const passwordCorrect = user === null
+      ? false
+      : await bcrypt.compare(password, user.password_hash)
+  
+    if (!(user && passwordCorrect)) {
+      return response.status(401).json({
+        error: 'invalid username or password'
+      })
+    }
+  
+    const userForToken = {
+      username: user.username,
+      id: user.id,
+    }
+  
+    const token = jwt.sign(userForToken, process.env.SECRET)
+  
+    response
+      .status(200)
+      .send({ token, username: user.username, name: user.name })
+  })
+
+
 
 // Get all
 
@@ -60,10 +99,42 @@ app.get('/api/users' , (req,res) => {
     })
   })
 
+  app.post('/api/orders/:itemid', async (req, res) => {
+    const body = req.body
+
+    const decodedToken = jwt.verify(getTokenFrom(req), process.env.SECRET)
+    if (!decodedToken.id) {
+      return response.status(401).json({ error: 'token invalid' })
+    }
+    const user = await User.findById(decodedToken.id)
+
+    if (body.name === undefined) {
+      return res.status(400).json({ error: 'content missing' })
+    }
+  
+    const order = new Order({
+      item:req.params.itemid,
+      amount:body.amount
+    })
+    orderedItem = Item.findById(req.params.itemId)
+    orderedItem.orders.concat(order.id)
+    await orderedItem.save()
+    order.save().then(savedOrder => {
+      res.json(savedOrder)
+    })
+  })
+
 
   // Create new items TODO ALSO FOR ITEMS
-  app.post('/api/items', (req, res) => {
+  app.post('/api/items', async (req, res) => {
     const body = req.body
+
+    const decodedToken = jwt.verify(getTokenFrom(req), process.env.SECRET)
+    if (!decodedToken.id) {
+      return response.status(401).json({ error: 'token invalid' })
+    }
+    const user = await User.findById(decodedToken.id)
+
     if (body.name === undefined) {
       return res.status(400).json({ error: 'content missing' })
     }
