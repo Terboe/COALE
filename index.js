@@ -129,9 +129,13 @@ app.get('/api/users' , (req,res) => {
   app.post('/api/items', async (req, res) => {
     const body = req.body
 
-    const decodedToken = jwt.verify(getTokenFrom(req), process.env.SECRET)
+    try{
+      const decodedToken = jwt.verify(getTokenFrom(req), process.env.SECRET)
+    }catch(err){
+      return res.status(401).json({ error: 'token invalid' })
+    }
     if (!decodedToken.id) {
-      return response.status(401).json({ error: 'token invalid' })
+      return res.status(401).json({ error: 'token invalid' })
     }
     const user = await User.findById(decodedToken.id)
 
