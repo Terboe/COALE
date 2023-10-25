@@ -62,11 +62,11 @@ app.use(morgan(function (tokens, req, res) {
       id: user.id,
     }
   
-    const token = jwt.sign(userForToken, process.env.SECRET)
+    const token = jwt.sign(userForToken, process.env.SECRET, {expiresIn: 60*60 })
   
     response
       .status(200)
-      .send({ token, username: user.username, name: user.name })
+      .send({ token, username: user.username, name: user.name, })
   })
 
 
@@ -93,6 +93,14 @@ app.get('/api/users' , (req,res) => {
     })
   })
 
+  app.get('/api/items/:category' , (req,res) => {
+    Item.find({sorting_tags:req.params.category}).then(items => {
+      res.json(items)
+    })
+  })
+
+
+
   app.get('/api/users/:id' , (req,res) => {
     User.find({id:req.params.id}).then(users => {
       res.json(users)
@@ -108,16 +116,17 @@ app.get('/api/users' , (req,res) => {
     }
     const user = await User.findById(decodedToken.id)
 
-    if (body.name === undefined) {
+    if (body.quantity === undefined) {
       return res.status(400).json({ error: 'content missing' })
     }
   
     const order = new Order({
       item:req.params.itemid,
-      amount:body.amount
+      quantity:body.quantity
     })
-    orderedItem = Item.findById(req.params.itemId)
+    orderedItem = await Item.findById(req.params.itemid)
     orderedItem.orders.concat(order.id)
+    orderedItem.orders_now = orderedItem.orders_now + body.quantity
     await orderedItem.save()
     order.save().then(savedOrder => {
       res.json(savedOrder)
@@ -129,11 +138,7 @@ app.get('/api/users' , (req,res) => {
   app.post('/api/items', async (req, res) => {
     const body = req.body
 
-    try{
-      const decodedToken = jwt.verify(getTokenFrom(req), process.env.SECRET)
-    }catch(err){
-      return res.status(401).json({ error: 'token invalid' })
-    }
+    const decodedToken = jwt.verify(getTokenFrom(req), process.env.SECRET)
     if (!decodedToken.id) {
       return res.status(401).json({ error: 'token invalid' })
     }

@@ -18,7 +18,6 @@ mongoose.connect(url)
 
 const itemSchema = new mongoose.Schema({
     name: String,
-    category:String,
     description: String,
     orders_needed: Number,
     orders_now: {type:Number, default: 0},
@@ -27,8 +26,14 @@ const itemSchema = new mongoose.Schema({
     start_date: {type:Date , default: Date.now},
     end_date: Date,
     //FIX THIS OR REMOVE IT, ITEM DOENS'T NEED TO KNOW ORDERS!
-    orders: {type:[String], default: []},
-    photoURL: {type: String, default: "https://upload.wikimedia.org/wikipedia/commons/1/10/Banana_isolated_on_white.jpg"}
+    orders: [
+      {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'Order'
+      }
+    ],
+    photoURL: {type: String, default: "https://upload.wikimedia.org/wikipedia/commons/1/10/Banana_isolated_on_white.jpg"},
+    sorting_tags: {type: [String] , default:[]}
   })
 
 
