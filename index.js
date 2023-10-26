@@ -31,9 +31,6 @@ app.use(morgan(function (tokens, req, res) {
   return (ret)
   }))
 
- 
-
-
 
   const getTokenFrom = request => {
     const authorization = request.get('authorization')
@@ -93,8 +90,15 @@ app.get('/api/users' , (req,res) => {
     })
   })
 
-  app.get('/api/items/:category' , (req,res) => {
-    Item.find({sorting_tags:req.params.category}).then(items => {
+  app.get('/api/categories/:category' , (req,res) => {
+    console.log(req.params.category)
+    Item.find({ sorting_tags: { $in: [req.params.category] } }).then(items => {
+      res.json(items)
+    })
+  })
+
+  app.get('/api/items/search/:searchword', (req,res) => {
+    Item.find({ name: { $regex: new RegExp(req.params.searchword, "i") } }).then(items => {
       res.json(items)
     })
   })
@@ -108,6 +112,7 @@ app.get('/api/users' , (req,res) => {
   })
 
   app.post('/api/orders/:itemid', async (req, res) => {
+
     const body = req.body
 
     const decodedToken = jwt.verify(getTokenFrom(req), process.env.SECRET)
@@ -155,7 +160,8 @@ app.get('/api/users' , (req,res) => {
       orders_needed: body.orders_needed,
       price:body.price,
       URL: body.URL,
-      end_date: body.end_date
+      end_date: body.end_date,
+      sorting_tags:body.sorting_tags
     })
     
     item.save().then(savedItem => {
