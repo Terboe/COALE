@@ -1,1 +1,1 @@
-get http://localhost:3002/api/categories/food
+get http://localhost:3002/api/categories/kitchen

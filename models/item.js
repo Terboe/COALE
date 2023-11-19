@@ -1,31 +1,41 @@
 
 const mongoose = require('mongoose')
 
-
-const url = process.env.MONGODB_URL
-
-mongoose.set('strictQuery', false)
-console.log("connecting to database")
-mongoose.connect(url)
-  .then(result => {
-    console.log('connected to MongoDB')
-  })
-  .catch((error) => {
-    console.log('error connecting to MongoDB:', error.message)
-  })
-
-
-
 const itemSchema = new mongoose.Schema({
-    name: String,
-    description: String,
-    orders_needed: Number,
-    orders_now: {type:Number, default: 0},
-    price: Number,
-    URL: String,
+    name: {
+      type: String,
+      maxlength: 40,
+      required:true
+    },
+    description:{
+      type: String,
+      maxlength: 200,
+      required:true
+    },
+    orders_needed:{
+      type: Number,
+      min: 1,
+      max: 100000000000,
+      required:true
+    },
+    orders_now:{
+      type:Number,
+      default: 0
+    },
+    price: {
+      type:Number,
+      min:0,
+      required:true
+    },
+    URL: {
+      type:String
+    },
     start_date: {type:Date , default: Date.now},
-    end_date: Date,
-    //FIX THIS OR REMOVE IT, ITEM DOENS'T NEED TO KNOW ORDERS!
+    end_date: {
+      type:Date,
+      required:true
+    },
+
     orders: [
       {
         type: mongoose.Schema.Types.ObjectId,

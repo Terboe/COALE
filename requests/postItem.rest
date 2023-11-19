@@ -1,12 +1,12 @@
-POST http://localhost:3002/api/items HTTP/1.1
+POST http://localhost:3003/api/items HTTP/1.1
 Content-Type: application/json
-Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6IlN0cmluZzMiLCJpZCI6IjY1MzI0NWFhNzM2NmJiMGQxMDZiY2I3YyIsImlhdCI6MTY5ODIzNDQ5MSwiZXhwIjoxNjk4MjM4MDkxfQ.ZPtC86I_9J3vo_Y51er--2GjHlgaVHp01MQYD6G423c
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6IlN0cmluZzMiLCJpZCI6IjY1MzI0NWFhNzM2NmJiMGQxMDZiY2I3YyIsImlhdCI6MTY5OTAyNDA4OSwiZXhwIjoxNjk5MDI3Njg5fQ.WSvlz5kg0_wlmrYa2CqE67SAPk9s6b9qljNVxZ-jh7w
 
 {
-    "name": "TEsT",
+    "name": "Small Banana",
     "description": "String",
-    "orders_needed": 100,
-    "price": 1,
+    "orders_needed": 200,
+    "price": 0.5,
     "URL": "httptest",
     "end_date": "2023-12-12",
     "sorting_tags": ["test" , "food"]
