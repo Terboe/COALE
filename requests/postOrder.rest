@@ -1,5 +1,6 @@
-POST https://coale-backend.onrender.com/api/orders/653a209a3fe10fc5de241c13 HTTP/1.1
+POST http://localhost:3003/api/orders/65573000ca1b1f0b52afe7fe HTTP/1.1
 Content-Type: application/json
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6IlN0cmluZzMiLCJpZCI6IjY1MzI0NWFhNzM2NmJiMGQxMDZiY2I3YyIsImlhdCI6MTcwMTA4MTg5OCwiZXhwIjoxNzAxMDg1NDk4fQ.JEX19JKKr1ioAtyCdL5_imZjwIKb46FqNxSenOL1htA
 
 {
     "quantity" : 20

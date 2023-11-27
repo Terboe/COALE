@@ -1,19 +1,19 @@
 const usersRouter = require('express').Router()
 const User = require('../models/user')
-
+const bcrypt = require('bcrypt')
 usersRouter.get('/' , (req,res) => {
     User.find({}).then(users => {
       res.json(users)
     })
 })
 
-usersRouter.get('/api/users/:id' , (req,res) => {
+usersRouter.get('/:id' , (req,res) => {
     User.find({id:req.params.id}).then(users => {
       res.json(users)
     })
 })
 
-usersRouter.post('/api/users', async (req, res) => {
+usersRouter.post('/', async (req, res) => {
     const body = req.body
     if (body.username === undefined) {
       return res.status(400).json({ error: 'content missing' })

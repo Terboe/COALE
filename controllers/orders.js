@@ -55,7 +55,7 @@ ordersRouter.delete('/:orderid' , async(req,res,next) => {
   }
 })
 
-ordersRouter.post('/:itemid', async (req, res, next) => {
+ordersRouter.post('/', async (req, res, next) => {
 
   const body = req.body
   let decodedToken = null
@@ -77,31 +77,45 @@ ordersRouter.post('/:itemid', async (req, res, next) => {
     return res.status(404).json({ error: 'User not found' });
   }
  
-  if (body.quantity === undefined) {
+  if ( !body.content[0] || body.content[0].quantity == undefined) {
     return res.status(400).json({ error: 'content missing' })
   }
-  orderedItem = await Item.findById(req.params.itemid)
+  const errs = []
 
-  if(!orderedItem){
-    return res.status(404).json({error:"Item not found"})
+const addOrder = async ord => {
+
+    orderedItem = await Item.findById(ord.itemid)
+
+    if(!orderedItem){
+      errs.concat({itemid: ord.itemid, error: "Item not found"})
+      return
+    }
+
+    const order = new Order({
+      item:ord.itemid,
+      quantity:ord.quantity,
+      user_id: decodedToken.id
+    })
+
+    orderedItem.orders = orderedItem.orders.concat(order.id)
+    orderedItem.orders_now = orderedItem.orders_now + ord.quantity
+    await orderedItem.save()
+    user.orders = user.orders.concat(order._id)
+    await order.save()
+    return
   }
 
-  const order = new Order({
-    item:req.params.itemid,
-    quantity:body.quantity,
-    user_id: decodedToken.id
+  body.content.forEach(async obj => {
+    await addOrder(obj)
   })
-
-  orderedItem.orders = orderedItem.orders.concat(order.id)
-  orderedItem.orders_now = orderedItem.orders_now + body.quantity
-  await orderedItem.save()
-  user.orders = user.orders.concat(order._id)
   await user.save()
-  order.save().then(savedOrder => {
-    res.json(savedOrder)
-  })
-})
+  if(errs.length == 0){
+    return res.status(200).json({message: "all items ordered"})
+  }else{
+    return res.status(400).json({errors:errs})
+  }
 
+  })
 
 
 module.exports = ordersRouter
