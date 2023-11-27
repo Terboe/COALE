@@ -5,6 +5,18 @@ const User = require('../models/user')
 const jwt = require('jsonwebtoken')
 
 
+itemsRouter.get('/searchcategory/:category' , (req,res) => {
+  console.log(req.params.category)
+  Item.find({ sorting_tags: { $in: [req.params.category] } }).then(items => {
+    res.json(items)
+  })
+})
+
+itemsRouter.get('/searchname/:searchword', (req,res) => {
+  Item.find({ name: { $regex: new RegExp(req.params.searchword, "i") } }).then(items => {
+    res.json(items)
+  })
+})
 
 const getTokenFrom = request => {
   const authorization = request.get('authorization')
