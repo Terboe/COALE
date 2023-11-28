@@ -35,8 +35,11 @@ ordersRouter.get('/' , async (req,res,next) => {
   if(!user || !user.id){
     return res.status(404).json({error: "user not found"})
   }
-  return res.status(200).json({orders:user.orders})
-
+  const orders = await Order.find({_id: {$in: user.orders}})
+  if(!orders || orders.length == 0){
+    return res.status(404).json({error:"can't find orders"})
+  }
+  return res.status(200).json({orders:orders})
 })
 
 ordersRouter.delete('/:orderid' , async(req,res,next) => {
@@ -109,7 +112,10 @@ ordersRouter.post('/', async (req, res, next) => {
   const errs = []
 
 const addOrder = async ord => {
-
+  const user = await User.findOne({_id:decodedToken.id})
+  if (!user) {
+    return res.status(404).json({ error: 'User not found' });
+  }
     orderedItem = await Item.findById(ord.itemid)
 
     if(!orderedItem){
@@ -126,15 +132,15 @@ const addOrder = async ord => {
     orderedItem.orders = orderedItem.orders.concat(order.id)
     orderedItem.orders_now = orderedItem.orders_now + ord.quantity
     await orderedItem.save()
-    user.orders = user.orders.concat(order._id)
+    user.orders = user.orders.concat(order.id)
     await order.save()
+    await user.save()
     return
   }
 
-  body.content.forEach(async obj => {
+  for (const obj of body.content) {
     await addOrder(obj)
-  })
-  await user.save()
+  }
   if(errs.length == 0){
     return res.status(200).json({message: "all items ordered"})
   }else{
