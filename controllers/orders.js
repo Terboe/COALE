@@ -14,6 +14,31 @@ const getTokenFrom = request => {
   return null
 
 }
+
+ordersRouter.get('/' , async (req,res,next) => {
+  let decodedToken = null
+ 
+  if(getTokenFrom(req)){
+    try{
+    decodedToken = jwt.verify(getTokenFrom(req), process.env.SECRET)
+    } catch(error){
+      next(error)
+      return
+
+    }
+  }
+  if (!decodedToken || !decodedToken.id) {
+    return res.status(401).json({ error: 'token invalid' })
+  }
+
+  const user = await User.findById(decodedToken.id)
+  if(!user || !user.id){
+    return res.status(404).json({error: "user not found"})
+  }
+  return res.status(200).json({orders:user.orders})
+
+})
+
 ordersRouter.delete('/:orderid' , async(req,res,next) => {
   let decodedToken = null
  
@@ -29,6 +54,7 @@ ordersRouter.delete('/:orderid' , async(req,res,next) => {
   if (!decodedToken || !decodedToken.id) {
     return res.status(401).json({ error: 'token invalid' })
   }
+
   
   const order = await Order.findById(req.params.orderid)
   console.log(order.user_id , decodedToken.id)
