@@ -36,10 +36,18 @@ ordersRouter.get('/' , async (req,res,next) => {
     return res.status(404).json({error: "user not found"})
   }
   const orders = await Order.find({_id: {$in: user.orders}})
+  const retobj = []
   if(!orders || orders.length == 0){
     return res.status(404).json({error:"can't find orders"})
   }
-  return res.status(200).json({orders:orders})
+  for (const ord of orders){
+    const it = await Item.findById(ord.item)
+    retobj.push({
+      quantity: ord.quantity,
+      item: it
+    })  
+  }
+  return res.status(200).json({orders:retobj})
 })
 
 ordersRouter.delete('/:orderid' , async(req,res,next) => {
