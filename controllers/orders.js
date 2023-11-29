@@ -67,9 +67,8 @@ ordersRouter.delete('/:orderid' , async(req,res,next) => {
   if (!decodedToken || !decodedToken.id) {
     return res.status(401).json({ error: 'token invalid' })
   }
-
+  const order = await Order.findById(req.params.orderid)
   if(order.user_id == decodedToken.id){
-    const order = await Order.findById(req.params.orderid)
     if(order.status != 'Pending'){
       return res.status(400).json({error: "the order has already been delivered"})
     }
