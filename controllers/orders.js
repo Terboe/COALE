@@ -43,6 +43,7 @@ ordersRouter.get('/' , async (req,res,next) => {
   for (const ord of orders){
     const it = await Item.findById(ord.item)
     retobj.push({
+      orderid: ord.id,
       quantity: ord.quantity,
       item: it
     })  
@@ -66,9 +67,6 @@ ordersRouter.delete('/:orderid' , async(req,res,next) => {
     return res.status(401).json({ error: 'token invalid' })
   }
 
-  
-  const order = await Order.findById(req.params.orderid)
-  console.log(order.user_id , decodedToken.id)
   if(order.user_id == decodedToken.id){
     const order = await Order.findById(req.params.orderid)
     if(order.status != 'Pending'){
