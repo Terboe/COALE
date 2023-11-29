@@ -44,6 +44,7 @@ ordersRouter.get('/' , async (req,res,next) => {
     const it = await Item.findById(ord.item)
     retobj.push({
       orderid: ord.id,
+      userid: ord.user_id,
       quantity: ord.quantity,
       item: it
     })  
