@@ -23,6 +23,8 @@ mongoose.connect(config.MONGODB_URL)
     logger.error('error connection to MongoDB:', error.message)
   })
 
+app.use(express.static('dist'))
+
 app.use(cors())
 app.use(express.json())
 app.use(middleware.requestLogger)
